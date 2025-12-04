@@ -17,15 +17,15 @@ function ServicesAdmin() {
   const dispatch = useDispatch();
   const { services } = useSelector((state: RootState) => state.services);
 
- useEffect(() => {
-  const fetchAndSetServices = () => {
+  const fetchAndSetServices = useCallback(() => {
     getServices().then((data) => {
       dispatch(setServices(data));
     });
-  };
-  
-  fetchAndSetServices();
-}, [dispatch]); 
+  }, [dispatch]);
+
+  useEffect(() => {
+    fetchAndSetServices();
+  }, [fetchAndSetServices]); 
 
   return (
     <div className={styles.wrapper}>

@@ -1,6 +1,6 @@
 import styles from "./ProductsAdmin.module.css";
 import ButtonAdd from "../../components/ButtonAdd/ButtonAdd";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import ProductsAndSevicesModal from "./ProductsAndSevicesModal";  
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../../store/store";
@@ -26,14 +26,15 @@ export default function ProductsAdmin() {
   });
 }, [dispatch]);
 
-const fetchAndSetProducts = () => {
+const fetchAndSetProducts = useCallback(() => {
   getProducts(null, "", "", ""   ).then(data => {
     dispatch(setProducts(data));
   });
-};
+}, [dispatch]);
+
     useEffect(() => {
    fetchAndSetProducts();
-  }, [dispatch]); 
+  }, [fetchAndSetProducts]); 
   
 return (
     <div className={styles.wrapper}>
