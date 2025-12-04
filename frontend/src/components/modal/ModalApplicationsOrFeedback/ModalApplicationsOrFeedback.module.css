@@ -1,0 +1,70 @@
+.backdrop {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;    
+}
+
+.modal_applications{
+    position: relative; 
+    background-color: #303030;
+    padding: 1vw;
+    width: 80%;
+    max-width: 22vw;
+    border-radius: 1vw;
+    color: #e1dad1;
+    text-align: center;
+    font-size: 1.2vw;
+}
+
+
+
+.modal_applications_form{
+    margin-top: 1vw;
+    display: flex;
+    flex-direction: column;
+    gap: 1vw;
+}
+
+.modal_applications_form_input{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal_applications_input{
+    height: 13vh;
+    width: 100%;
+
+}
+
+.module_button{
+    border: none;
+    border-radius: 0.5vw;
+    background-color: #e1dad1;
+    color: #303030;
+    height: 2vw;
+    font-size: 1vw;
+}
+
+.close_button {
+    position: absolute;
+    top: -3vw; 
+    right: -2.7vw; 
+    background: transparent;
+    border: none;
+    font-size: 1.8vw; 
+    color: #e1dad1;
+    transition: color 0.2s;
+    z-index: 10;
+    cursor: pointer;
+}
+
+
+
+
+

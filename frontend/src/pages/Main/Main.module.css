@@ -1,0 +1,55 @@
+.text {
+  text-align: center;
+  margin: 100px auto;
+  max-width: 75vw;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.logo {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 3vw;
+}
+
+.title {
+  font-size: 2vw;
+}
+
+.image-container {
+  width: 100vw; /* Используем полную ширину окна */
+}
+
+.photo {
+  width: 100vw;
+  height: 47vh;
+  object-fit: cover;
+  margin-bottom: 120px;
+}
+
+.contacts {
+  display: flex;
+  justify-content: space-between;
+  width: 90%;
+  margin: 0 auto;
+  margin-top: 13vh;
+  font-size: 1vw;
+  margin-bottom: 2vh;
+}
+
+.address_and_name {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+
+.phone_and_email {
+  display: flex;
+  flex-direction: column;
+
+}
+
+
+

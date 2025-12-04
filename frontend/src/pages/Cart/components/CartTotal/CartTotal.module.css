@@ -1,0 +1,64 @@
+.cartTotal {
+    align-self: start;
+    background-color: #303030;
+    
+    width: 20vw;
+   
+}
+
+.application{
+    border: 2px solid #cfcbc4;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+ background-color: #303030;
+ color: #e1dad1;
+    text-align: center;
+    font-size: 1vw;
+    font-weight: bold;
+}
+
+.img {
+    width: 60%;
+    margin: 0 auto;
+}
+
+.button_application{
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    cursor: pointer;
+}
+
+.total{
+   background-color: #cfcbc4;
+   padding: 1.7vw;
+   color: #303030;
+   font-size: 1vw;
+   border-bottom-left-radius: 8px;
+   border-bottom-right-radius: 8px;
+
+}
+
+
+
+.total_text{
+    font-weight: bold;
+}
+.button_order{
+    border-radius: 0.5vw;
+    display: block;
+    align-self: center;
+    font-size: 1vw;
+    text-decoration: none;
+    background-color: #303030;
+    color: #e1dad1;
+    padding: 0.5vw;
+     width: 100%;
+     margin-top: 1vw;
+     cursor: pointer;
+}
+
+.button_order:active{
+    position: relative;
+    transform: scale(0.98);
+}
+

@@ -1,0 +1,19 @@
+# .dockerignore для frontend
+# Те же принципы, что и для backend
+
+node_modules
+dist
+.env
+.env.local
+*.log
+.git
+.gitignore
+.vscode
+.idea
+*.swp
+*.swo
+*.tmp
+.DS_Store
+
+
+

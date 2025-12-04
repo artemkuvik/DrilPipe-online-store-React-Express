@@ -1,0 +1,35 @@
+.categoryFilter {
+ flex-wrap: wrap;
+    gap: 10px;
+    display: flex;
+   color: white;
+    width: 57.5%;
+    
+    
+}
+
+.categoryButton {
+    height: 2.3vw;
+    font-size: 1vw;
+    color: #303030;
+    background-color: #e1dad1;
+    text-decoration: none;
+    padding: 0.2vw 1vw;
+    border-radius: 0.5vw;
+    cursor: pointer;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.categoryButton:hover {
+     opacity: 0.8;
+    
+    
+ 
+}
+
+/* Стиль для активной кнопки */
+.categoryButton.active {
+ background: #605a51;
+    border-radius: 10px;
+}

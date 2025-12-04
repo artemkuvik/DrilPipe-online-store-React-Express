@@ -1,0 +1,76 @@
+.wrapper {
+  width: 100%;
+  padding: 2vw;
+  background: #222;
+  border-radius: 1vw;
+  overflow: hidden;
+     
+}
+
+
+
+.tableWrapper {
+  max-height: 90%;
+  overflow-y: auto;
+  border-radius: 0.5vw;
+  border: 1px solid #e1dad1;
+  background: #222;
+
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #222;
+  color: #e1dad1;
+  font-size: 1vw;
+  table-layout: fixed
+}
+
+.thead th {
+  background: #303030;
+  color: #e1dad1;
+  padding: 0.7vw 0.5vw;
+  border-bottom: 2px solid #e1dad1;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.table th, .table td {
+  border: 1px solid #e1dad1;
+  padding: 0.5vw 0.5vw;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table tr:nth-child(even) {
+  background: #282828;
+}
+
+tr:hover {
+  background: #353535;
+}
+
+/* Перенос строк только для центральной (сообщение) колонки */
+.messageCell {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* Ширины колонок: 1) email, 2) сообщение (шире), 3) дата, 4) действия (уже) */
+.table th:nth-child(1), .table td:nth-child(1) { width: 21%; }
+.table th:nth-child(2), .table td:nth-child(2) { width: 46%; }
+.table th:nth-child(3), .table td:nth-child(3) { width: 21%; }
+.table th:nth-child(4), .table td:nth-child(4) { width: 12%; }
+
+.deleteButton {
+  background: #ffdddd;
+  color: #a00;
+}
+
+.deleteButton:hover {
+  background: #ffbdbd;
+  color: #fff;
+}

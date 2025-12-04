@@ -1,0 +1,47 @@
+.priceFilterForm {
+    width: 17vw;
+    border: 2px solid #605a51;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px #1b1e22;
+    margin: 0.4vw 0;
+    height: 400px;
+}
+
+.priceFilterForm label {
+font-size: 0.9vw;
+    color: #e1dad1;
+    margin: 5px 0;
+    display: block;
+}
+
+
+
+.priceInput {
+    width: 100%;
+    margin: 2px 0 15px;
+    background-color: #f1f1f1;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.9vw;
+}       
+.applyButton {
+    background-color: #e1dad1;
+    color: #303030;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5vw 0vw;
+    width: 100%;
+    margin-top: 0.5vw;
+    cursor: pointer;
+    font-size: 1vw;
+}
+
+.applyButton:hover {
+    opacity: 0.8;
+}
+
+.applyButton:active {
+    opacity: 0.6;
+}
+

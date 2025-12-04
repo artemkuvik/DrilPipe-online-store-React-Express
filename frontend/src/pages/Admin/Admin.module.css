@@ -1,0 +1,22 @@
+.title {
+  margin: 2vw auto;
+  width: calc(40% - 1vw);
+  background-color: #e1dad1;
+  padding: 0.5vw;
+  border-radius: 0.5vw;
+  text-align: center;
+  font-size: 1.5vw;
+  color: black;
+  font-weight: 300;
+}
+
+.admin_container {
+  display: flex;
+    height: 33vw;
+    width: 75%;
+    margin: 0px auto;
+    border-radius: 0.5vw;
+    gap: 0.5vw;
+}
+
+

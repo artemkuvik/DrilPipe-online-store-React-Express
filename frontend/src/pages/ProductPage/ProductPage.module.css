@@ -1,0 +1,88 @@
+.cartWrapper {
+  display: flex;
+  max-width: 40%;
+  font-size: 1vw;
+  margin: 8% auto;
+  border: 1px solid #e1dad1;
+  border-radius: 1vw;
+  padding: 2vw;
+  background: #222;
+  color: #e1dad1;
+  gap: 25px;
+}
+
+.firstColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+
+.secondColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  
+}
+
+.firstButton {
+ justify-content: flex-start;
+}
+.secondButton {
+  justify-content: flex-end;
+}
+
+.productName {
+  font-size: 1.1vw;
+  font-weight: bold;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #e1dad1;
+  padding-bottom: 5px;
+}
+
+.productInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  height: 100%;
+}
+
+.productImage {
+  height: 22vw;
+    object-fit: cover;
+    border-radius: 0.5vw;
+    width: 60vw;
+ 
+}
+
+.firstButton {
+  color: #e1dad1;
+  background-color: #303030;
+  border-radius: 0.5vw;
+  padding: 0.5vw;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.back {
+  margin: 0 auto;
+  padding-right: 1vw;
+}
+
+.secondButton {
+  color: #e1dad1;
+  background-color: #303030;
+  border-radius: 0.5vw;
+  padding: 0.5vw;
+ transition: all 0.2s;
+ cursor: pointer;
+}
+
+.secondButton:hover, .firstButton:hover {
+  background-color: #444;
+}
+
+
+

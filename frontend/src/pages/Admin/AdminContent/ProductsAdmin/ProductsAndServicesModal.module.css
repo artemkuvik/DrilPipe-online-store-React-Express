@@ -1,0 +1,59 @@
+.modalOverlay {
+  color: #303030;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(48, 48, 48, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: #fff;
+  padding: 2vw 2vw 1vw 2vw;
+  border-radius: 1vw;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+  min-width: 320px;
+  max-width: 90vw;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 1vw;
+  right: 1vw;
+  font-size: 2vw;
+  color: #303030;
+  cursor: pointer;
+}
+
+.form {
+  padding-top: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 1vw;
+}
+
+
+
+.saveButton {
+  background: rgb(225, 218, 209);
+  color: rgb(48, 48, 48);
+  border: none;
+  border-radius: 0.5vw;
+  padding: 0.5vw 1vw;
+  font-size: 1vw;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.saveButton:hover {
+  background: #e1dad1cc;
+}
+
+
+

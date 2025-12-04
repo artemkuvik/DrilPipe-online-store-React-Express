@@ -1,0 +1,136 @@
+
+.profile{
+    display: flex;
+    flex-direction: column;
+    font-family: "Lato", sans-serif;
+    max-width: 40vw;
+    margin: 2.8vw auto;
+    background-color: #303030;
+    color: #e1dad1;
+    padding: 1vw;
+    border-radius: 0.5vw;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.orders{
+  
+  padding-right: 0.4vw;  
+  height: 50vh;       
+  overflow-y: auto;        
+  overflow-x: hidden; 
+ 
+}
+
+.order_wrapper{
+    padding: 0.2vw;
+    border: 2px solid #98a39f8a;
+    border-radius: 0.5vw;
+    
+}
+
+.title{
+    font-size: 1.5vw;
+    font-weight: 600;
+    margin-bottom: 1vw;
+}
+
+.email{
+    font-size: 1vw;
+    padding-bottom: 0.8vw;
+    border-bottom: 2px solid #e1dad1;
+}
+
+.filters{
+    margin-top: 0.5vw;
+}
+
+.order_number{
+    font-size: 1vw;
+    margin-top: 0.6vw;
+}
+.select{
+    margin: 0.5vw auto;
+    padding: 0.2vw 0.4vw;
+    font-size: 1vw;
+    border: none;
+    border-radius: 0.5vw;
+    background-color: #e1dad1;
+    color: #333;
+    cursor: pointer;
+    max-width: 10vw;
+}
+.order_photo{
+    width: 4vw;
+    height: 4vw;
+    object-fit: cover;
+    border-radius: 0.5vw;
+}
+.order_detail{
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 0.5vw;
+    margin-bottom: 0.5vw;
+    border: 1px solid #b6b5b338;
+    border-radius: 0.5vw;
+    
+}
+
+.order_footer{
+    display: flex;
+    justify-content: space-between;
+    padding: 0 0.5vw;
+}
+
+.order_info{
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 0.2vw;
+    margin-bottom: 0.5vw;
+}
+
+.order_button{
+    align-self: center;
+    height: 2vw;
+    width: 8vw;
+    font-size: 0.9vw;
+    border: none;
+    border-radius: 0.5vw;
+    background-color: #e1dad1;
+    color: #333;
+    cursor: pointer;
+}
+
+.button_exit{
+    margin: 1vw auto 0;
+    font-size: 1vw;
+    padding: 0.2vw 0.8vw;
+    border: none;
+    border-radius: 0.5vw;
+    background-color: #e1dad1;
+    color: #333;
+    cursor: pointer;
+}
+
+.no_orders_container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2vw;
+font-size: 2vw;
+    font-weight: 600;
+   height: 50vh;  
+}
+
+.no_order_image{
+    width: 10vw;
+    height: 10vw;
+}
+
+.no_orders_text{
+    font-size: 4vw;
+    font-weight: 600;
+}

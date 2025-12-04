@@ -1,0 +1,197 @@
+# ============================================
+# Docker Compose - Оркестрация всех сервисов
+# ============================================
+# Этот файл описывает ВСЕ сервисы нашего приложения
+# и как они взаимодействуют друг с другом
+
+# ============================================
+# СЕРВИСЫ (Services)
+# ============================================
+# Каждый сервис = один контейнер
+# У нас будет 3 сервиса: MySQL, Backend, Frontend
+
+services:
+  # ============================================
+  # СЕРВИС 1: MySQL (База данных)
+  # ============================================
+  mysql:
+    # Используем официальный образ MySQL
+    image: mysql:8.0
+    
+    # Имя контейнера (удобно для отладки)
+    container_name: dril_pipe_mysql
+    
+    # Перезапуск контейнера при сбое
+    restart: unless-stopped
+    
+    # Переменные окружения для MySQL
+    environment:
+      # Пароль для root пользователя
+      MYSQL_ROOT_PASSWORD: rootpassword
+      # Имя базы данных (создастся автоматически)
+      MYSQL_DATABASE: dril_pipe
+      # Пользователь для приложения (не root)
+      MYSQL_USER: app_user
+      # Пароль для пользователя приложения
+      MYSQL_PASSWORD: app_password
+    
+    # Порты: внешний:внутренний
+    # 3307:3306 = снаружи доступ на порту 3307, внутри контейнера 3306
+    # Зачем 3307? Чтобы не конфликтовать с XAMPP (который на 3306)
+    ports:
+      - "3307:3306"
+    
+    # Том (volume) для сохранения данных
+    # Если контейнер удалится, данные останутся в mysql_data
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Можно добавить SQL дамп для автоматической инициализации
+      # - ./my_dril_pipe.sql:/docker-entrypoint-initdb.d/init.sql
+    
+    # Healthcheck - проверка, что MySQL готов принимать подключения
+    # Backend будет ждать, пока MySQL полностью запустится
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    
+    # Сеть (все сервисы в одной сети могут общаться по имени)
+    networks:
+      - app_network
+
+  # ============================================
+  # СЕРВИС 2: Backend (Node.js + Express)
+  # ============================================
+  backend:
+    # Собираем образ из Dockerfile в папке backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    
+    container_name: dril_pipe_backend
+    
+    restart: unless-stopped
+    
+    # Порты: внешний:внутренний
+    ports:
+      - "5000:5000"
+    
+    # ВАЖНО: Не используем env_file, чтобы переменные из backend/.env не переопределяли наши настройки
+    # Вместо этого задаём все переменные явно в environment
+    # env_file:
+    #   - ./backend/.env
+    
+    # Переопределяем переменные, которые должны быть другими в Docker
+    environment:
+      # ВАЖНО: В Docker контейнеры общаются по именам сервисов!
+      # "mysql" - это имя сервиса выше, Docker создаст DNS запись автоматически
+      DB_HOST: mysql
+      # Используем root для тестирования (в продакшене лучше app_user)
+      # root пароль: rootpassword (из настроек MySQL выше)
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+      DB_NAME: dril_pipe
+      # Порт приложения
+      PORT: 5000
+      # Секретный ключ для JWT (в продакшене должен быть сложнее!)
+      SECRET_KEY: your-secret-key-change-in-production
+    
+    # Зависимости: backend запустится ПОСЛЕ mysql И после того, как MySQL будет здоров
+    depends_on:
+      mysql:
+        condition: service_healthy
+    
+    # Том для загруженных файлов (фото товаров)
+    volumes:
+      - ./backend/static:/app/static
+    
+    # Сеть
+    networks:
+      - app_network
+
+  # ============================================
+  # СЕРВИС 3: Frontend (React + Nginx)
+  # ============================================
+  frontend:
+    # Собираем образ из Dockerfile в папке frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      # Передаём переменную при сборке
+      # Это нужно для VITE_API_URL
+      # ВАЖНО: Используем localhost, потому что браузер обращается с твоего компьютера!
+      # НЕ добавляем /api, потому что в коде уже добавляется "api/" к путям
+      args:
+        VITE_API_URL: http://localhost:5000/
+    
+    container_name: dril_pipe_frontend
+    
+    restart: unless-stopped
+    
+    # Порты: внешний:внутренний
+    ports:
+      - "5173:80"
+    
+    # Зависимости: frontend запустится ПОСЛЕ backend
+    depends_on:
+      - backend
+    
+    # Сеть
+    networks:
+      - app_network
+
+  # ============================================
+  # СЕРВИС 4: phpMyAdmin (Управление базой данных)
+  # ============================================
+  phpmyadmin:
+    # Используем официальный образ phpMyAdmin
+    image: phpmyadmin/phpmyadmin
+    
+    container_name: dril_pipe_phpmyadmin
+    
+    restart: unless-stopped
+    
+    # Порты: внешний:внутренний
+    ports:
+      - "8080:80"
+    
+    # Переменные окружения для подключения к MySQL
+    environment:
+      # Хост MySQL (имя сервиса!)
+      PMA_HOST: mysql
+      # Порт MySQL (внутренний порт контейнера)
+      PMA_PORT: 3306
+      # Пользователь для подключения
+      MYSQL_ROOT_PASSWORD: rootpassword
+    
+    # Зависимости: phpMyAdmin запустится ПОСЛЕ mysql
+    depends_on:
+      mysql:
+        condition: service_healthy
+    
+    # Сеть
+    networks:
+      - app_network
+
+# ============================================
+# ТОМЫ (Volumes)
+# ============================================
+# Постоянное хранилище данных
+# Даже если контейнер удалится, данные останутся
+
+volumes:
+  mysql_data:
+    # Имя тома для MySQL данных
+
+# ============================================
+# СЕТИ (Networks)
+# ============================================
+# Виртуальная сеть для связи между контейнерами
+
+networks:
+  app_network:
+    # Имя сети
+    driver: bridge
+    # Тип сети (bridge = контейнеры могут общаться друг с другом)
+

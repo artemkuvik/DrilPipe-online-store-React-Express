@@ -1,0 +1,13 @@
+.button {
+    background-color: rgb(225, 218, 209);
+    color: rgb(48, 48, 48);
+    display: inline-block;
+    width: 10vw;
+    text-align: center;
+    margin-top: -0.5vw;
+    padding: 0.2vw;
+    border-radius: 0.5vw;
+    text-decoration: underline ;
+    font-family: Lato, sans-serif;
+    cursor: pointer;
+}

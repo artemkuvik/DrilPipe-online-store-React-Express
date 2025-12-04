@@ -1,0 +1,26 @@
+.searchBarContainer {
+    position: relative;
+    width: 23vw;
+}
+
+.searchIcon {
+       position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0.8vw;
+    width: 1.5vw;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+.searchBar {
+    width: 23vw;
+    font-size: 1vw;
+    color: #fff;
+    background-color: #262626;
+    border: none;
+    text-decoration: none;
+    padding: 0.7vw 2.9vw 0.7vw 0.7vw;
+    border-radius: 0.5vw;
+     
+}
+

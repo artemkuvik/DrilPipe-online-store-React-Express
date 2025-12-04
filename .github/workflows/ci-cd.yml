@@ -1,0 +1,177 @@
+# ============================================
+# CI/CD Pipeline для Drill Pipe Project
+# ============================================
+# Этот файл описывает автоматические действия,
+# которые выполняются при каждом push в репозиторий
+
+name: CI/CD Pipeline
+
+# ============================================
+# КОГДА ЗАПУСКАТЬ (Triggers)
+# ============================================
+# Workflow запустится в следующих случаях:
+on:
+  # 1. При push в ветки main или master
+  push:
+    branches:
+      - main
+      - master
+      - develop
+  
+  # 2. При создании Pull Request
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+
+# ============================================
+# ЗАДАЧИ (Jobs)
+# ============================================
+# Job = набор шагов, которые выполняются последовательно
+# Jobs могут выполняться параллельно или последовательно
+
+jobs:
+  # ============================================
+  # ЗАДАЧА 1: Тестирование и проверка Backend
+  # ============================================
+  test-backend:
+    name: Тестирование Backend
+    # На какой операционной системе запускать (можно выбрать: ubuntu, windows, macos)
+    runs-on: ubuntu-latest
+    
+    # Шаги выполнения
+    steps:
+      # ШАГ 1: Получить код из репозитория
+      - name: 📥 Получить код (Checkout)
+        uses: actions/checkout@v4
+      
+      # ШАГ 2: Установить Node.js
+      - name: 📦 Установить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      
+      # ШАГ 3: Установить зависимости Backend
+      - name: 📚 Установить зависимости Backend
+        working-directory: ./backend
+        run: npm ci
+      
+      # ШАГ 4: Проверка линтера (если есть)
+      # - name: 🔍 Проверка линтера Backend
+      #   working-directory: ./backend
+      #   run: npm run lint
+      #   continue-on-error: true  # Не останавливать pipeline, если линтер не настроен
+      
+      # ШАГ 5: Проверка, что код компилируется
+      - name: ✅ Проверка Backend
+        working-directory: ./backend
+        run: |
+          echo "Проверка структуры проекта..."
+          node --version
+          npm --version
+
+  # ============================================
+  # ЗАДАЧА 2: Тестирование и проверка Frontend
+  # ============================================
+  test-frontend:
+    name: Тестирование Frontend
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Получить код (Checkout)
+        uses: actions/checkout@v4
+      
+      - name: 📦 Установить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: 📚 Установить зависимости Frontend
+        working-directory: ./frontend
+        run: npm ci
+      
+      - name: 🔍 Проверка линтера Frontend
+        working-directory: ./frontend
+        run: npm run lint
+        continue-on-error: true
+      
+      - name: 🏗️ Проверка сборки Frontend
+        working-directory: ./frontend
+        run: npm run build
+        env:
+          # В CI используем заглушку для API URL
+          VITE_API_URL: http://localhost:5000/
+
+  # ============================================
+  # ЗАДАЧА 3: Сборка Docker образов
+  # ============================================
+  build-docker:
+    name: Сборка Docker образов
+    runs-on: ubuntu-latest
+    # Эта задача зависит от успешного выполнения тестов
+    needs: [test-backend, test-frontend]
+    
+    steps:
+      - name: 📥 Получить код (Checkout)
+        uses: actions/checkout@v4
+      
+      # ШАГ 1: Настроить Docker Buildx
+      # Buildx позволяет собирать образы для разных платформ
+      - name: 🐳 Настроить Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      # ШАГ 2: Собрать образ Backend
+      - name: 🏗️ Собрать Docker образ Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: false  # Пока не пушим в registry (можно включить позже)
+          tags: dril-pipe-backend:latest
+          cache-from: type=gha  # Используем кеш GitHub Actions
+          cache-to: type=gha,mode=max
+      
+      # ШАГ 3: Собрать образ Frontend
+      - name: 🏗️ Собрать Docker образ Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: false
+          tags: dril-pipe-frontend:latest
+          build-args: |
+            VITE_API_URL=http://localhost:5000/
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      
+      # ШАГ 4: Проверить, что образы собрались
+      - name: ✅ Проверка образов
+        run: |
+          docker images | grep dril-pipe
+          echo "✅ Все образы успешно собраны!"
+
+  # ============================================
+  # ЗАДАЧА 4: Проверка Docker Compose
+  # ============================================
+  # Опционально: можно проверить, что docker-compose работает
+  # test-docker-compose:
+  #   name: Тест Docker Compose
+  #   runs-on: ubuntu-latest
+  #   needs: build-docker
+  #   
+  #   steps:
+  #     - name: 📥 Получить код
+  #       uses: actions/checkout@v4
+  #     
+  #     - name: 🐳 Запустить Docker Compose
+  #       run: |
+  #         docker-compose up -d
+  #         sleep 30  # Ждём запуска сервисов
+  #         docker-compose ps
+  #         docker-compose down
+

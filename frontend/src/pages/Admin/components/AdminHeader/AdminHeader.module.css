@@ -1,0 +1,12 @@
+
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;  
+  margin-bottom: 1vw;
+  border-bottom: 2px solid #e1dad1;
+  padding-bottom: 0.2vh;
+}
+
