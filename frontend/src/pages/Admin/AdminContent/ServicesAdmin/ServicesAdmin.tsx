@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import AdminHeader from "../../components/AdminHeader/AdminHeader";
 import ButtonAdd from "../../components/ButtonAdd/ButtonAdd";
 import styles from "./ServicesAdmin.module.css";
@@ -17,14 +17,15 @@ function ServicesAdmin() {
   const dispatch = useDispatch();
   const { services } = useSelector((state: RootState) => state.services);
 
+ useEffect(() => {
   const fetchAndSetServices = () => {
     getServices().then((data) => {
       dispatch(setServices(data));
     });
   };
-  useEffect(() => {
-    fetchAndSetServices();
-  }, [dispatch]);        
+  
+  fetchAndSetServices();
+}, [dispatch]); 
 
   return (
     <div className={styles.wrapper}>

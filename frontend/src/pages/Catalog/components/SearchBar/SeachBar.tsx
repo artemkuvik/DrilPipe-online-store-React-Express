@@ -1,6 +1,6 @@
 import styles from "./SearchBar.module.css";
 import searchIcon from "../../../../images/icons/search.svg";
-import { useCallback, useEffect, useState } from "react";
+import { useMemo, useEffect, useState } from "react";
 import debounce from "lodash/debounce";
 
 type SearchBarProps = {
@@ -11,10 +11,10 @@ type SearchBarProps = {
 export default function SearchBar({onSearch, search = ""}: SearchBarProps) {
     const [searchValue, setSearchValue] = useState<string>(search);
     
-    const debouncedSearch = useCallback(
-      debounce((val: string) => {
+    const debouncedSearch = useMemo(
+      () => debounce((val: string) => {
         onSearch(val);
-      }, 600), 
+      }, 600),
       [onSearch]
     );
 
