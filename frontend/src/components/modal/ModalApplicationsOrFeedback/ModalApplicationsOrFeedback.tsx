@@ -45,10 +45,15 @@ export default function ModalApplicationsOrFeedback({ onClose, serviceId = 0, ap
                 alert("Заявка отправлена");
                 onClose();
             }
-        } catch (error: any) {
+        } catch (error) {
             console.error("Ошибка при отправке:", error);
-            if (error.response?.status === 401) {
-                alert("Вы не авторизованы. Пожалуйста, войдите в систему.");
+            if (error && typeof error === 'object' && 'response' in error) {
+                const apiError = error as { response?: { status?: number } };
+                if (apiError.response?.status === 401) {
+                    alert("Вы не авторизованы. Пожалуйста, войдите в систему.");
+                } else {
+                    alert("Произошла ошибка при отправке. Попробуйте позже.");
+                }
             } else {
                 alert("Произошла ошибка при отправке. Попробуйте позже.");
             }

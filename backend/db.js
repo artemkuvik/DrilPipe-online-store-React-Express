@@ -22,7 +22,7 @@ const tempConnection = await connectWithRetry({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  charset: 'utf8mb4', // Устанавливаем правильную кодировку для кириллицы
+  charset: 'utf8mb4',
 });
 
 await tempConnection.query(
@@ -35,7 +35,7 @@ const db = await connectWithRetry({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  charset: 'utf8mb4', // Устанавливаем правильную кодировку для кириллицы
+  charset: 'utf8mb4',
 });
 
 console.log("✅ Подключение к базе данных установлено!");

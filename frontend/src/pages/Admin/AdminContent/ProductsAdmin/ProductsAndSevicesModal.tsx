@@ -92,7 +92,7 @@ export default function ProductsAndSevicesModal({ onClose, onSave, addOrChange, 
       }
       onSave();
       onClose();
-    } catch (error) {
+    } catch  {
       alert("Ошибка при добавлении товара");
     }
   }
