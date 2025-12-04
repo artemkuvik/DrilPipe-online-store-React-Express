@@ -1,6 +1,3 @@
-# .dockerignore для frontend
-# Те же принципы, что и для backend
-
 node_modules
 dist
 .env
@@ -14,6 +11,7 @@ dist
 *.swo
 *.tmp
 .DS_Store
+
 
 
 

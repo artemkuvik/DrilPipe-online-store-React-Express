@@ -1,31 +1,37 @@
 import styles from "./Main.module.css";
 import centrPhoto from "../../images/images/centr_photo.png";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getServices } from "../../http/servicesAPI";
 import Slider from "./components/Slider/Slider";
 import ButtonFeedback from "./components/ButtonFeedback/ButtonFeedback";
 import ModalApplicationsOrFeedback from "../../components/modal/ModalApplicationsOrFeedback/ModalApplicationsOrFeedback";
-import { useSelector } from "react-redux";
-import {RootState} from "../../store/store"
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../../store/store";
+import { setServices } from "../../store/ServicesSlice";
 import { useNavigate } from "react-router-dom";
-import {AUTHORIZATION_ROUTE} from "../../utils/consts"
+import { AUTHORIZATION_ROUTE } from "../../utils/consts";
 
 
 function Main() {
-  const [services, setServices] = useState([]);
-  const [isModalApplicationsOpen, setIsModalApplicationsOpen] = useState(false)
+  const [isModalApplicationsOpen, setIsModalApplicationsOpen] = useState(false);
   const [serviceId, setServiceId] = useState<number>(0);
-  const [applicationsOrFeedback, setApplicationsOrFeedback] = useState<boolean>(true)
-  const user = useSelector((state: RootState) => state.user.user)
-  const navigate = useNavigate()
+  const [applicationsOrFeedback, setApplicationsOrFeedback] = useState<boolean>(true);
+  const user = useSelector((state: RootState) => state.user.user);
+  const { services } = useSelector((state: RootState) => state.services);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const fetchAndSetServices = useCallback(() => {
+    getServices().then((data) => {
+      dispatch(setServices(data));
+    });
+  }, [dispatch]);
 
   useEffect(() => {
-    const fetchData = async () => {   
-      const data = await getServices();
-      setServices(data);
-    };
-    fetchData();
-  }, []);
+    if (services.length === 0) {
+      fetchAndSetServices();
+    }
+  }, [services.length, fetchAndSetServices]);
 
   const feedbackClick = () => {
         if (user) {
