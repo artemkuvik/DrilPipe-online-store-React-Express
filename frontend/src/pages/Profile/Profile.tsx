@@ -15,12 +15,8 @@ function Profile() {
 
   useEffect(() => {
     getOrdersForUser().then(data => {
-      console.log(data);
       setOrders(data);
-      console.log(filteredOrders.length);
-      
     });
-
   }, [user]);
 
   const handleCancelOrder =async (id: number, newStatus: string) => {

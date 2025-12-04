@@ -58,7 +58,7 @@ export default function ProductsAndSevicesModal({ onClose, onSave, addOrChange, 
       setDescription('');
       setPhoto(null);
     }
-  }, [addOrChange, product, categories, addProductModal, addServiceModal]);
+  }, [addOrChange, product, service, categories, addProductModal, addServiceModal]);
 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
