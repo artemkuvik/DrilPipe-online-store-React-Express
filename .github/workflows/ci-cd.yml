@@ -99,72 +99,88 @@ jobs:
           # В CI используем заглушку для API URL
           VITE_API_URL: http://localhost:5000/
 
-  # ЗАДАЧА 3: Сборка Docker образов
-  build-docker:
-    name: Сборка Docker образов
+  # ЗАДАЧА 3: Сборка и публикация Docker образов
+  build-and-push-docker:
+    name: Сборка и публикация Docker образов
     runs-on: ubuntu-latest
     # Эта задача зависит от успешного выполнения тестов
     needs: [test-backend, test-frontend]
+    # Публикуем только при push в main (не при PR)
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     
     steps:
       - name: 📥 Получить код (Checkout)
         uses: actions/checkout@v4
       
-      # ШАГ 1: Настроить Docker Buildx
+      # ШАГ 1: Вход в GitHub Container Registry
+      - name: 🔐 Вход в GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      # ШАГ 2: Настроить Docker Buildx
       - name: 🐳 Настроить Docker Buildx
         uses: docker/setup-buildx-action@v3
       
-      # ШАГ 2: Собрать образ Backend
-      - name: 🏗️ Собрать Docker образ Backend
+      # ШАГ 3: Собрать и опубликовать образ Backend
+      - name: 🏗️ Собрать и опубликовать Docker образ Backend
         uses: docker/build-push-action@v5
         with:
           context: ./backend
           file: ./backend/Dockerfile
-          push: false  # Только сборка, без публикации
-          tags: dril-pipe-backend:latest
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/dril-pipe-backend:latest
+            ghcr.io/${{ github.repository_owner }}/dril-pipe-backend:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
       
-      # ШАГ 3: Собрать образ Frontend
-      - name: 🏗️ Собрать Docker образ Frontend
+      # ШАГ 4: Собрать и опубликовать образ Frontend
+      - name: 🏗️ Собрать и опубликовать Docker образ Frontend
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
-          push: false  # Только сборка, без публикации
-          tags: dril-pipe-frontend:latest
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/dril-pipe-frontend:latest
+            ghcr.io/${{ github.repository_owner }}/dril-pipe-frontend:${{ github.sha }}
           build-args: |
             VITE_API_URL=http://localhost:5000/
           cache-from: type=gha
           cache-to: type=gha,mode=max
       
-      # ШАГ 4: Проверка сборки
-      - name: ✅ Проверка сборки образов
+      # ШАГ 5: Проверка публикации
+      - name: ✅ Проверка публикации образов
         run: |
-          echo "✅ Все образы успешно собраны!"
-          echo "Backend и Frontend образы готовы к использованию"
+          echo "✅ Все образы успешно собраны и опубликованы!"
+          echo "Backend: ghcr.io/${{ github.repository_owner }}/dril-pipe-backend:latest"
+          echo "Frontend: ghcr.io/${{ github.repository_owner }}/dril-pipe-frontend:latest"
 
   # ЗАДАЧА 4: Уведомления
   notify:
     name: Уведомления
     runs-on: ubuntu-latest
-    needs: [build-docker]
+    needs: [build-and-push-docker]
     if: always() && github.event_name == 'push'
     
     steps:
-      - name: ✅ Успешная сборка
+      - name: ✅ Успешная сборка и публикация
         if: success()
         run: |
           echo "✅ CI/CD успешно завершён!"
           echo "✅ Backend тесты пройдены"
           echo "✅ Frontend тесты пройдены"
-          echo "✅ Docker образы собраны"
+          echo "✅ Docker образы собраны и опубликованы в GitHub Container Registry"
       
       - name: ❌ Ошибка сборки
         if: failure()
         run: |
-          echo "❌ Ошибка при сборке!"
+          echo "❌ Ошибка при сборке или публикации!"
           echo "Проверьте логи выше для деталей"
+          echo "Убедитесь, что права настроены: Settings → Actions → General → Workflow permissions"
 
   
 
