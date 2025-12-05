@@ -99,55 +99,126 @@ jobs:
           # В CI используем заглушку для API URL
           VITE_API_URL: http://localhost:5000/
 
-  # ЗАДАЧА 3: Сборка Docker образов
-  build-docker:
-    name: Сборка Docker образов
+  # ЗАДАЧА 3: Сборка и публикация Docker образов
+  build-and-push-docker:
+    name: Сборка и публикация Docker образов
     runs-on: ubuntu-latest
     # Эта задача зависит от успешного выполнения тестов
     needs: [test-backend, test-frontend]
+    # Публикуем только при push в main (не при PR)
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     
     steps:
       - name: 📥 Получить код (Checkout)
         uses: actions/checkout@v4
       
-      # ШАГ 1: Настроить Docker Buildx
-      # Buildx позволяет собирать образы для разных платформ
+      # ШАГ 1: Вход в GitHub Container Registry
+      - name: 🔐 Вход в GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      # ШАГ 2: Настроить Docker Buildx
       - name: 🐳 Настроить Docker Buildx
         uses: docker/setup-buildx-action@v3
       
-      # ШАГ 2: Собрать образ Backend
-      - name: 🏗️ Собрать Docker образ Backend
+      # ШАГ 3: Собрать и опубликовать образ Backend
+      - name: 🏗️ Собрать и опубликовать Docker образ Backend
         uses: docker/build-push-action@v5
         with:
           context: ./backend
           file: ./backend/Dockerfile
-          push: false  # Пока не пушим в registry (можно включить позже)
-          tags: dril-pipe-backend:latest
-          cache-from: type=gha  # Используем кеш GitHub Actions
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/dril-pipe-backend:latest
+            ghcr.io/${{ github.repository_owner }}/dril-pipe-backend:${{ github.sha }}
+          cache-from: type=gha
           cache-to: type=gha,mode=max
       
-      # ШАГ 3: Собрать образ Frontend
-      - name: 🏗️ Собрать Docker образ Frontend
+      # ШАГ 4: Собрать и опубликовать образ Frontend
+      - name: 🏗️ Собрать и опубликовать Docker образ Frontend
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
-          push: false
-          tags: dril-pipe-frontend:latest
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/dril-pipe-frontend:latest
+            ghcr.io/${{ github.repository_owner }}/dril-pipe-frontend:${{ github.sha }}
           build-args: |
-            VITE_API_URL=http://localhost:5000/
+            VITE_API_URL=${{ secrets.VITE_API_URL || 'http://localhost:5000/' }}
+          # Если нужно использовать переменную окружения из секретов:
+          # env:
+          #   VITE_API_URL: ${{ secrets.VITE_API_URL || 'http://localhost:5000/' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
       
-      # ШАГ 4: Проверить, что образы собрались
-      # Примечание: docker images может не показывать образы, собранные через buildx,
-      # но это нормально - главное, что сборка прошла без ошибок
-      - name: ✅ Проверка образов
+      # ШАГ 5: Проверка публикации
+      - name: ✅ Проверка публикации образов
         run: |
-          echo "✅ Все образы успешно собраны!"
-          echo "Backend и Frontend образы собраны через Docker Buildx"
-          # Проверяем через buildx, если нужно
-          docker buildx ls || true
+          echo "✅ Все образы успешно собраны и опубликованы!"
+          echo "Backend: ghcr.io/${{ github.repository_owner }}/dril-pipe-backend:latest"
+          echo "Frontend: ghcr.io/${{ github.repository_owner }}/dril-pipe-frontend:latest"
+
+  # ЗАДАЧА 4: Деплой через GitHub Actions (CD)
+  deploy:
+    name: Деплой на сервер
+    runs-on: ubuntu-latest
+    needs: [build-and-push-docker]
+    # Деплоим только при push в main/master
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    
+    steps:
+      - name: 📥 Получить код (Checkout)
+        uses: actions/checkout@v4
+      
+      # ШАГ 1: Подключение к серверу через SSH
+      - name: 🔐 Настроить SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      
+      # ШАГ 2: Деплой на сервер
+      - name: 🚀 Деплой на сервер
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH || '/var/www/dril-pipe' }}
+          REPO_OWNER: ${{ github.repository_owner }}
+        run: |
+          ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "
+            cd ${DEPLOY_PATH} &&
+            git pull origin main &&
+            docker-compose down &&
+            docker pull ghcr.io/${REPO_OWNER}/dril-pipe-backend:latest &&
+            docker pull ghcr.io/${REPO_OWNER}/dril-pipe-frontend:latest &&
+            docker-compose up -d &&
+            docker image prune -f &&
+            echo '✅ Деплой завершён успешно!'
+          "
+
+  # ЗАДАЧА 5: Уведомления
+  notify:
+    name: Уведомления
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    if: always() && github.event_name == 'push'
+    
+    steps:
+      - name: ✅ Успешный деплой
+        if: success()
+        run: |
+          echo "✅ Деплой успешно завершён!"
+          echo "Образы опубликованы в GitHub Container Registry"
+          echo "Приложение развёрнуто на сервере"
+      
+      - name: ❌ Ошибка деплоя
+        if: failure()
+        run: |
+          echo "❌ Ошибка при деплое!"
+          echo "Проверьте логи выше для деталей"
 
   
 
